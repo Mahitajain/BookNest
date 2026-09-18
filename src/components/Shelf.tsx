@@ -11,25 +11,24 @@ import {
 import type { Book } from "../data/books";
 import { useShelfInteraction } from "../hooks/useShelfInteraction";
 import { spineHeightOf, spineWidthOf, BOOK_CONFIG, type SpineRect } from "./bookFaces";
-import { BookDetail } from "./BookDetail";
 import { BookSpine } from "./BookSpine";
 
 type Props = {
   books: Book[];
   justAdded?: string;
   compact?: boolean;
+  onOpenBook: (bookId: string, rect: SpineRect) => void;
 };
 
 /** A row narrower than this fraction of the viewport is centred instead of looped. */
 const LOOP_MIN_FRACTION = 0.5;
 
-export function Shelf({ books, justAdded, compact }: Props) {
+export function Shelf({ books, justAdded, compact, onOpenBook }: Props) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const [angles, setAngles] = useState<number[]>([]);
   const [overflowing, setOverflowing] = useState(true);
-  const [open, setOpen] = useState<{ index: number; rect: SpineRect } | null>(null);
   const [flashId, setFlashId] = useState<string | null>(null);
   const [vp, setVp] = useState(() => (typeof window !== "undefined" ? window.innerWidth : 0));
   const drag = useRef<{ x: number; sl: number; moved: boolean } | null>(null);
@@ -142,7 +141,6 @@ export function Shelf({ books, justAdded, compact }: Props) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (open) return;
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       const scroller = scrollerRef.current;
       if (!scroller) return;
@@ -151,7 +149,7 @@ export function Shelf({ books, justAdded, compact }: Props) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     if (!justAdded) return;
@@ -187,7 +185,9 @@ export function Shelf({ books, justAdded, compact }: Props) {
 
   const openAt = (i: number, rect: SpineRect) => {
     if (skipClick.current) return;
-    setOpen({ index: i % books.length, rect });
+    const target = books[i % books.length];
+    if (!target) return;
+    onOpenBook(target.id, rect);
   };
 
   if (!books.length) {
@@ -280,15 +280,6 @@ export function Shelf({ books, justAdded, compact }: Props) {
         </div>
       </div>
 
-      {open ? (
-        <BookDetail
-          book={books[open.index]}
-          books={books}
-          rect={open.rect}
-          onClose={() => setOpen(null)}
-          onChange={(next) => setOpen((cur) => (cur ? { ...cur, index: next } : cur))}
-        />
-      ) : null}
     </section>
   );
 }

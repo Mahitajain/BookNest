@@ -11,6 +11,60 @@ type Props = {
   onChange: (index: number) => void;
 };
 
+function renderBlurbText(text: string) {
+  if (!text) return null;
+
+  const pattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi;
+  const parts: Array<string | { type: "link"; label: string; url: string }> = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    const [fullMatch, label, url] = match;
+
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    const cleanLabel = label.trim();
+    const cleanUrl = url.trim();
+
+    if (cleanLabel && cleanUrl) {
+      parts.push({ type: "link", label: cleanLabel, url: cleanUrl });
+    } else {
+      parts.push(fullMatch);
+    }
+
+    lastIndex = match.index + fullMatch.length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.map((part, index) => {
+    if (typeof part === "string") {
+      return (
+        <span key={`book-text-${index}`} className="break-words whitespace-pre-wrap">
+          {part}
+        </span>
+      );
+    }
+
+    return (
+      <a
+        key={`book-link-${index}`}
+        href={part.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline break-words rounded-sm text-foreground/80 underline decoration-[rgba(120,110,125,0.45)] decoration-1 underline-offset-2 transition-colors duration-200 hover:text-foreground hover:decoration-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      >
+        {part.label}
+      </a>
+    );
+  });
+}
+
 function Stars({ rating }: { rating: number }) {
   if (!rating) {
     return <span className="font-mono uppercase tracking-[0.16em] text-muted-foreground">Unrated</span>;
@@ -159,9 +213,9 @@ export function BookDetail({ book, books, rect, onClose, onChange }: Props) {
         </h2>
         <p className="mt-2 font-sans text-lg text-foreground/75">{book.author}</p>
         {book.blurb ? (
-          <p className="mt-5 font-sans text-[15px] leading-relaxed text-foreground/80">
-            {book.blurb}
-          </p>
+          <div className="mt-5 font-sans text-[15px] leading-relaxed text-foreground/80 [&_a]:inline [&_a]:break-words [&_a]:rounded-sm [&_a]:text-foreground/80 [&_a]:underline [&_a]:decoration-[rgba(120,110,125,0.45)] [&_a]:decoration-1 [&_a]:underline-offset-2 [&_a]:transition-colors [&_a]:duration-200 hover:[&_a]:text-foreground hover:[&_a]:decoration-foreground/60 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/40">
+            <p className="overflow-wrap-anywhere break-words whitespace-pre-wrap">{renderBlurbText(book.blurb)}</p>
+          </div>
         ) : null}
         <div className="mt-5 text-lg">
           <Stars rating={book.rating} />
