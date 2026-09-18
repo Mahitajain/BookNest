@@ -141,7 +141,6 @@ export function BookDetail({ book, books, rect, onClose, onChange }: Props) {
     };
   }, [rect, vp]);
 
-  const i = books.findIndex((b) => b.id === book.id);
   const font = faceFont[book.face];
 
   if (pose.narrow) {
@@ -202,22 +201,6 @@ export function BookDetail({ book, books, rect, onClose, onChange }: Props) {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 pb-2">
-              <button
-                type="button"
-                className="min-h-11 px-1 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 transition-colors hover:text-foreground"
-                onClick={() => onChange((i - 1 + books.length) % books.length)}
-              >
-                Previous
-              </button>
-              <span className="text-foreground/30">/</span>
-              <button
-                type="button"
-                className="min-h-11 px-1 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 transition-colors hover:text-foreground"
-                onClick={() => onChange((i + 1) % books.length)}
-              >
-                Next
-              </button>
-              <span className="text-foreground/30">/</span>
               <button
                 type="button"
                 className="min-h-11 px-1 font-mono text-[11px] uppercase tracking-[0.18em] text-primary transition-colors hover:text-foreground"
@@ -316,22 +299,6 @@ export function BookDetail({ book, books, rect, onClose, onChange }: Props) {
           <Stars rating={book.rating} />
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
-          <button
-            type="button"
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 hover:text-foreground"
-            onClick={() => onChange((i - 1 + books.length) % books.length)}
-          >
-            Previous
-          </button>
-          <span className="text-foreground/30">/</span>
-          <button
-            type="button"
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 hover:text-foreground"
-            onClick={() => onChange((i + 1) % books.length)}
-          >
-            Next
-          </button>
-          <span className="text-foreground/30">/</span>
           <button
             type="button"
             className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary hover:text-foreground"
