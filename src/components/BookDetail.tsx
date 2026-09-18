@@ -144,6 +144,94 @@ export function BookDetail({ book, books, rect, onClose, onChange }: Props) {
   const i = books.findIndex((b) => b.id === book.id);
   const font = faceFont[book.face];
 
+  if (pose.narrow) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-background text-foreground">
+        <div
+          className="mx-auto flex min-h-full w-full max-w-3xl flex-col items-center px-5 pb-10 pt-4 text-center sm:px-8 sm:pt-6"
+          style={{
+            opacity: out && !leaving ? 1 : 0,
+            transform: out && !leaving ? "translateY(0)" : "translateY(14px)",
+            transition: "opacity 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={retract}
+            className="mb-5 min-h-11 self-start px-2 text-left font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:mb-7"
+          >
+            ← Back to Shelf
+          </button>
+
+          <div className="w-[clamp(65vw,70vw,78vw)] max-w-[420px] shrink-0 overflow-hidden shadow-[20px_30px_60px_-24px_rgba(40,28,16,0.55)]">
+            {coverUrl ? (
+              <img
+                src={coverUrl}
+                alt={`Cover of ${book.title}`}
+                onError={onCoverError}
+                className="block aspect-[2/3] h-auto w-full object-cover"
+              />
+            ) : (
+              <div
+                className="flex aspect-[2/3] w-full flex-col justify-between p-5 text-left"
+                style={{ color: book.ink, background: book.spine }}
+              >
+                <p className={`text-lg leading-tight ${font}`}>{book.title}</p>
+                <p className="font-sans text-xs opacity-80">{book.author}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-7 w-full max-w-[650px] min-w-0">
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              {book.recommender ? `Recommended by ${book.recommender}` : book.finished ? `Finished ${book.finished}` : "On the shelf"}
+            </p>
+            <h2 className="mt-3 break-words font-display text-[clamp(1.8rem,8vw,2.7rem)] font-light leading-[1.12] text-foreground">
+              {book.title}
+            </h2>
+            <p className="mt-2 break-words font-sans text-lg leading-relaxed text-foreground/75">{book.author}</p>
+
+            {book.blurb ? (
+              <div className="mx-auto mt-7 w-[min(90%,650px)] min-w-0 font-sans text-[15px] leading-[1.7] text-foreground/80 [&_a]:inline [&_a]:break-words [&_a]:rounded-sm [&_a]:text-foreground/80 [&_a]:underline [&_a]:decoration-[rgba(120,110,125,0.45)] [&_a]:decoration-1 [&_a]:underline-offset-2 [&_a]:transition-colors [&_a]:duration-200 hover:[&_a]:text-foreground hover:[&_a]:decoration-foreground/60 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/40">
+                <p className="overflow-wrap-anywhere break-words whitespace-pre-wrap">{renderBlurbText(book.blurb)}</p>
+              </div>
+            ) : null}
+
+            <div className="mt-8 text-lg">
+              <Stars rating={book.rating} />
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 pb-2">
+              <button
+                type="button"
+                className="min-h-11 px-1 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 transition-colors hover:text-foreground"
+                onClick={() => onChange((i - 1 + books.length) % books.length)}
+              >
+                Previous
+              </button>
+              <span className="text-foreground/30">/</span>
+              <button
+                type="button"
+                className="min-h-11 px-1 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 transition-colors hover:text-foreground"
+                onClick={() => onChange((i + 1) % books.length)}
+              >
+                Next
+              </button>
+              <span className="text-foreground/30">/</span>
+              <button
+                type="button"
+                className="min-h-11 px-1 font-mono text-[11px] uppercase tracking-[0.18em] text-primary transition-colors hover:text-foreground"
+                onClick={retract}
+              >
+                Shelve it
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50">
       <button
@@ -205,6 +293,13 @@ export function BookDetail({ book, books, rect, onClose, onChange }: Props) {
           transition: "opacity 700ms cubic-bezier(0.16, 1, 0.3, 1) 260ms, transform 700ms cubic-bezier(0.16, 1, 0.3, 1) 260ms",
         }}
       >
+        <button
+          type="button"
+          onClick={retract}
+          className="mb-5 min-h-11 px-0 text-left font-mono text-[11px] uppercase tracking-[0.18em] text-foreground/70 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          ← Back to Shelf
+        </button>
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
           {book.recommender ? `Recommended by ${book.recommender}` : book.finished ? `Finished ${book.finished}` : "On the shelf"}
         </p>
