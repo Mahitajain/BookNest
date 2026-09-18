@@ -6,4 +6,4 @@ The idea came from an Instagram reel that showed a digital bookshelf, and I coul
 
 ## Live App
 
-[Visit BookNest](https://book-nest-git-main-mahita1.vercel.app/)
+[Visit BookNest](https://book-nest-mwyu90tnm-mahita1.vercel.app/)
